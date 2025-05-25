@@ -1,15 +1,16 @@
 class Article:
+    all = []
+
     def __init__(self, author, magazine, title):
         self._validate_auth_and_mag(author, magazine)
         self._author = author
         self._magazine = magazine
         self._validate_title(title)
         self._title = title
+        Article.all.append(self)
 
-        author.articles_list.append(self)
-        author.magazines_list.append(magazine)
-        magazine.magazine_articles.append(self)
-        magazine.magazine_authors.append(author)
+        author._append_to_magazines_list(self, magazine)
+        magazine._append_to_magazine_authors(self, author)
 
     @property
     def author(self):
@@ -85,13 +86,21 @@ class Author:
         magazine_categories = {mag.category for mag in self.magazines_list}
 
         return list(magazine_categories)
-        return
+
+    def _append_to_magazines_list(self, article, magazine):
+        self.articles_list.append(article)
+        if magazine not in self.magazines_list:
+            self.magazines_list.append(magazine)
 
 
 class Magazine:
+    magazines = []
+
     def __init__(self, name, category):
         self.name = name
         self.category = category
+        self.magazine_articles = []
+        self.magazine_authors = []
 
     @property
     def name(self):
@@ -101,9 +110,6 @@ class Magazine:
     def name(self, value):
         self._validate_name(value)
         self._name = value
-
-        self.magazine_articles = []
-        self.magazine_authors = []
 
     @property
     def category(self):
@@ -134,11 +140,46 @@ class Magazine:
     def article_titles(self):
         if not self.magazine_articles:
             return None
-        
+
         return [article.title for article in self.magazine_articles]
 
     def contributing_authors(self):
         if not self.magazine_authors:
             return None
-        
-        return [author.name for author in self.magazine_authors]
+
+        # I'm using a dict because the key-value pair structure will help me track articles coount per author
+        per_author_article_count = {}
+
+        for article in self.magazine_articles:
+            author = article.author
+            per_author_article_count[author] = per_author_article_count.get(
+                author, 0) + 1
+
+        contributing = [author for author,
+                        count in per_author_article_count.items() if count > 2]
+
+        if not contributing:
+            return None
+
+        return contributing
+
+    def _append_to_magazine_authors(self, article, author):
+        self.magazine_articles.append(article)
+        if author not in self.magazine_authors:
+            self.magazine_authors.append(author)
+
+    @classmethod
+    def top_publisher(cls, magazines):
+        if not cls.magazines:
+            return None
+
+        magazines_with_articles = [
+            magazine for magazine in cls.magazines if magazine.magazine_articles]
+
+        if not magazines_with_articles:
+            return None
+
+        top_magazine = max(magazines_with_articles,
+                           key=lambda mag: len(mag.magazine_articles))
+
+        return max(magazines_with_articles, key=lambda mag: len(mag.magazine_articles))
