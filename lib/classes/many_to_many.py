@@ -1,27 +1,60 @@
 class Article:
     def __init__(self, author, magazine, title):
-        self.author = author
-        self.magazine = magazine
-        self.title = title
+        self._author = author
+        self._magazine = magazine
+        self._validate_title(title)
+        self._title = title
+
+    @property
+    def author(self):
+        return self._author
+
+    @author.setter
+    def author(self, value):
+        if not isinstance(value, Author):
+            raise ValueError("The Author must be an instance of Author class.")
+        self._author = value
+
+    @property
+    def magazine(self):
+        return self._magazine
+
+    @magazine.setter
+    def magazine(self, value):
+        if not isinstance(value, Magazine):
+            raise ValueError("The Magazine must be an instance of Magazine class.")
+        self._magazine = value
+
+    @property
+    def title(self):
+        return self._title
+
+    def _validate_title(self, value):
+        if not isinstance(value, str):
+            raise ValueError("Title must be a string.")
+        if not 5 <= len(value.strip()) <= 50:
+            raise ValueError("Title must be between 5 and 50 characters long.")
 
 
 class Author:
     def __init__(self, name):
         self._validate_name(name)
         self._name = name
+        self.articles_list = []
+
 
     @property
     def name(self):
         return self._name
 
     def _validate_name(self, name):
-        if hasattr(self, '_name'):
-            raise AttributeError("Cannot modify name after initialization")
-        if len(name.strip()) == 0 or not isinstance(self.name, str):
+        if not isinstance(name, str):
             raise ValueError("Author name must be a non-empty string.")
+        if len(name.strip()) == 0:
+            raise ValueError("Author name cannot be empty.")
 
     def articles(self):
-        pass
+        return self._articles
 
     def magazines(self):
         pass
@@ -47,10 +80,25 @@ class Magazine:
         self._validate_name(value)
         self._name = value
 
+    @property
+    def category(self):
+        return self._category
+
+    @category.setter
+    def category(self, value):
+        self._validate_category(value)
+        self._category = value
+
     def _validate_name(self, name):
-        if 2 < len(name.strip()) > 16 or not isinstance(name, str):
+        if not isinstance(name, str):
+            raise ValueError("Magazine name must be a string.")
+        if not 2 <= len(name.strip()) <= 16:
             raise ValueError(
                 "Magazine name must be a string between 2 and 16 characters.")
+
+    def _validate_category(self, category):
+        if not isinstance(category, str) or len(category.strip()) == 0:
+            raise ValueError("Category must be a non-empty string.")
 
     def articles(self):
         pass
