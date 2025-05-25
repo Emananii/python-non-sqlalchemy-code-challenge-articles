@@ -94,13 +94,14 @@ class Author:
 
 
 class Magazine:
-    magazines = []
+    all = []
 
     def __init__(self, name, category):
         self.name = name
         self.category = category
         self.magazine_articles = []
         self.magazine_authors = []
+        Magazine.all.append(self)
 
     @property
     def name(self):
@@ -169,12 +170,12 @@ class Magazine:
             self.magazine_authors.append(author)
 
     @classmethod
-    def top_publisher(cls, magazines):
-        if not cls.magazines:
+    def top_publisher(cls):
+        if not cls.all:
             return None
 
         magazines_with_articles = [
-            magazine for magazine in cls.magazines if magazine.magazine_articles]
+            magazine for magazine in cls.all if magazine.magazine_articles]
 
         if not magazines_with_articles:
             return None
@@ -182,4 +183,4 @@ class Magazine:
         top_magazine = max(magazines_with_articles,
                            key=lambda mag: len(mag.magazine_articles))
 
-        return max(magazines_with_articles, key=lambda mag: len(mag.magazine_articles))
+        return top_magazine
