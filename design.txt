@@ -1,0 +1,9 @@
+Author - one to many - Articles
+Magazine - one to many - Articles
+Author - many to many - magazines
+
+Who owns who?
+
+Articles belong to Author and Magazine simultaneously. Compositional because articles cant exist independently.
+Authors and magazines dont own each other. They are loosely associated because instances of each class can exist independently. The
+loose association is made indirectly through class articles itself which inherently acts as the bridge.
