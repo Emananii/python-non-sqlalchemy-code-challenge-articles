@@ -1,9 +1,15 @@
 class Article:
     def __init__(self, author, magazine, title):
+        self._validate_auth_and_mag(author, magazine)
         self._author = author
         self._magazine = magazine
         self._validate_title(title)
         self._title = title
+
+        author.articles_list.append(self)
+        author.magazines_list.append(magazine)
+        magazine.magazine_articles.append(self)
+        magazine.magazine_authors.append(author)
 
     @property
     def author(self):
@@ -22,7 +28,8 @@ class Article:
     @magazine.setter
     def magazine(self, value):
         if not isinstance(value, Magazine):
-            raise ValueError("The Magazine must be an instance of Magazine class.")
+            raise ValueError(
+                "The Magazine must be an instance of Magazine class.")
         self._magazine = value
 
     @property
@@ -35,13 +42,21 @@ class Article:
         if not 5 <= len(value.strip()) <= 50:
             raise ValueError("Title must be between 5 and 50 characters long.")
 
+    @staticmethod  # turning this into a static method so that i can call it from the Author class for DRY purposes
+    def _validate_auth_and_mag(author, magazine):
+        if not isinstance(author, Author):
+            raise ValueError("Author must be an instance of Author class.")
+        if not isinstance(magazine, Magazine):
+            raise ValueError("Magazine must be an instance of Magazine class.")
+
 
 class Author:
     def __init__(self, name):
         self._validate_name(name)
         self._name = name
-        self.articles_list = []
 
+        self.articles_list = []
+        self.magazines_list = []
 
     @property
     def name(self):
@@ -54,16 +69,23 @@ class Author:
             raise ValueError("Author name cannot be empty.")
 
     def articles(self):
-        return self._articles
+        return self.articles_list
 
     def magazines(self):
-        pass
+        return self.magazines_list
 
     def add_article(self, magazine, title):
-        pass
+        Article._validate_auth_and_mag(self, magazine)
+        return Article(self, magazine, title)
 
     def topic_areas(self):
-        pass
+        if not self.magazines_list:
+            return None
+        # I'm using a set comprehension here rather than a list comprehension because I specifically want unique categories and sets dont allow duplicates
+        magazine_categories = {mag.category for mag in self.magazines_list}
+
+        return list(magazine_categories)
+        return
 
 
 class Magazine:
@@ -79,6 +101,9 @@ class Magazine:
     def name(self, value):
         self._validate_name(value)
         self._name = value
+
+        self.magazine_articles = []
+        self.magazine_authors = []
 
     @property
     def category(self):
@@ -101,13 +126,19 @@ class Magazine:
             raise ValueError("Category must be a non-empty string.")
 
     def articles(self):
-        pass
+        return self.magazine_articles
 
     def contributors(self):
-        pass
+        return self.magazine_authors
 
     def article_titles(self):
-        pass
+        if not self.magazine_articles:
+            return None
+        
+        return [article.title for article in self.magazine_articles]
 
     def contributing_authors(self):
-        pass
+        if not self.magazine_authors:
+            return None
+        
+        return [author.name for author in self.magazine_authors]
