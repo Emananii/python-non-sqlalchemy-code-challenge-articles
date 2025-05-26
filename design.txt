@@ -7,3 +7,10 @@ Who owns who?
 Articles belong to Author and Magazine simultaneously. Compositional because articles cant exist independently.
 Authors and magazines dont own each other. They are loosely associated because instances of each class can exist independently. The
 loose association is made indirectly through class articles itself which inherently acts as the bridge.
+
+
+Article Class|| Author Class
+We need to return a list of all the articles an author object has written.
+                    Paul
+Why Marriage fails             Emmanuel - Why marriage fails
+                               Why life sucks

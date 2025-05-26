@@ -18,9 +18,12 @@ class Article:
 
     @author.setter
     def author(self, value):
+        self._validate_author(value)
+        self._author = value
+
+    def _validate_author(self, value):
         if not isinstance(value, Author):
             raise ValueError("The Author must be an instance of Author class.")
-        self._author = value
 
     @property
     def magazine(self):
@@ -28,10 +31,12 @@ class Article:
 
     @magazine.setter
     def magazine(self, value):
-        if not isinstance(value, Magazine):
-            raise ValueError(
-                "The Magazine must be an instance of Magazine class.")
+        self._validate_magazine(value)
         self._magazine = value
+
+    def _validate_magazine(self, value):
+        if not isinstance(value, Magazine):
+            raise ValueError("Magazine must be an instance of Magazine class.")
 
     @property
     def title(self):
